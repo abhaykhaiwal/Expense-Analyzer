@@ -443,6 +443,45 @@ function refresh() {
   fetchAndRenderBudget();
 }
 
+// ─── AI Insights ─────────────────────────────────────────────────────────────
+
+document.getElementById('getInsightsBtn').addEventListener('click', async () => {
+  const btn       = document.getElementById('getInsightsBtn');
+  const loadingEl = document.getElementById('aiLoading');
+  const insightsEl = document.getElementById('aiInsights');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyzing...';
+  insightsEl.classList.add('hidden');
+  loadingEl.classList.remove('hidden');
+
+  try {
+    const res  = await fetch(`${API}/ai/insights`);
+    const data = await res.json();
+    insightsEl.innerHTML = res.ok ? formatInsights(data.insights) : `<p class="ai-error">⚠ ${data.error}</p>`;
+  } catch {
+    insightsEl.innerHTML = '<p class="ai-error">⚠ Could not reach the server.</p>';
+  } finally {
+    loadingEl.classList.add('hidden');
+    insightsEl.classList.remove('hidden');
+    btn.disabled = false;
+    btn.textContent = '✨ Get AI Insights';
+  }
+});
+
+function formatInsights(text) {
+  return text
+    .split('\n')
+    .map(line => {
+      if (/^\*\*(.+)\*\*$/.test(line)) return `<h4>${line.replace(/\*\*/g, '')}</h4>`;
+      if (/^[•\-\*] /.test(line))      return `<li>${line.slice(2).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</li>`;
+      if (line.trim() === '')           return '';
+      return `<p>${line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</p>`;
+    })
+    .join('')
+    .replace(/(<li>[\s\S]*?<\/li>)+/g, m => `<ul>${m}</ul>`);
+}
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
 document.getElementById('date').value = todayStr();

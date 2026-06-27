@@ -212,6 +212,50 @@ body {
 .income-bar { background: var(--green); }
 .expense-bar { background: var(--red); opacity: 0.7; }
 
+/* AI Card */
+.ai-card { margin-bottom: 20px; }
+.ai-header { display: flex; align-items: flex-start; justify-content: space-between; }
+.ai-header .section-title { margin-bottom: 4px; }
+.ai-subtitle { font-size: 12px; color: var(--grey-500); }
+
+.btn-ai {
+  background: linear-gradient(135deg, #4F46E5, #7C3AED);
+  color: #fff; border: none; padding: 10px 20px;
+  white-space: nowrap;
+}
+.btn-ai:hover { background: linear-gradient(135deg, #4338CA, #6D28D9); }
+.btn-ai:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ai-loading {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 20px; color: var(--grey-500); font-size: 14px;
+}
+.spinner {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--grey-200);
+  border-top-color: #7C3AED;
+  animation: spin 0.7s linear infinite; flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.ai-insights {
+  margin-top: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #F5F3FF, #EDE9FE);
+  border-radius: 10px;
+  border-left: 4px solid #7C3AED;
+  font-size: 14px; line-height: 1.7; color: var(--grey-900);
+}
+.ai-insights h4 {
+  font-size: 13px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: #5B21B6; margin: 14px 0 6px;
+}
+.ai-insights h4:first-child { margin-top: 0; }
+.ai-insights ul { padding-left: 18px; margin: 4px 0; }
+.ai-insights li { margin-bottom: 4px; }
+.ai-insights p { margin-bottom: 4px; }
+.ai-error { color: var(--red); font-weight: 500; }
+
 /* 5-card KPI row */
 .summary-grid { grid-template-columns: repeat(5, 1fr); }
 .summary-card.savings .card-value { color: var(--blue); }
