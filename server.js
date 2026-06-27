@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { Pool } = require('pg');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Groq = require('groq-sdk');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,8 +18,8 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-const genAI = process.env.GEMINI_API_KEY
-  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+const groq = process.env.GROQ_API_KEY
+  ? new Groq({ apiKey: process.env.GROQ_API_KEY })
   : null;
 
 app.use(cors());
@@ -213,7 +213,7 @@ app.put('/api/budget', async (req, res) => {
 // ─── AI Insights (Gemini) ────────────────────────────────────────────────────
 
 app.get('/api/ai/insights', async (req, res) => {
-  if (!genAI) return res.status(503).json({ error: 'GEMINI_API_KEY not set in .env' });
+  if (!groq) return res.status(503).json({ error: 'GROQ_API_KEY not set in .env' });
   try {
     const [{ rows: txRows }, { rows: [s] }] = await Promise.all([
       pool.query('SELECT * FROM transactions ORDER BY date DESC'),
@@ -266,9 +266,13 @@ Respond in this exact format:
 
 Be specific, concise, and use Indian rupee context.`;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const result = await model.generateContent(prompt);
-    res.json({ insights: result.response.text() });
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 500,
+    });
+    res.json({ insights: completion.choices[0].message.content });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
